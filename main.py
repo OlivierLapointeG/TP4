@@ -34,9 +34,9 @@ def psi_0_vec(L,N):
     Retourne : le vecteur psi(0)
     '''
     a = L/N
-    psi0 = np.empty([N+1,1],complex)
+    psi0 = np.zeros([N+1,1],complex)
     for i in range(N):
-        psi0[i]=psi_0(i*a,L)
+        psi0[i]=(psi_0((i)*a,L))
     return psi0
 
 def matrice(lettre,N,L,h):
@@ -84,9 +84,9 @@ def v_vec(h,psi,N):
     b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
     b_2 = h*1j*hbar/(4*m_e**2)
     for i in range(N):
-        valpropre[i] = b_1-2*(b_2**2)**(1/2)*np.cos((i*np.pi)/(N+1))
+        valpropre[i] = b_1-2*(b_2**2)**(1/2)*np.cos(((i)*np.pi)/(N+1))
         v[i]=valpropre[i]*psi[i]
-    return v
+    return matmul()
 
 
 def Crank_Nico(h,N):
@@ -97,7 +97,3 @@ def Crank_Nico(h,N):
 
     Retourne:
     '''
-
-
-print(v_vec(1e-18,psi_0_vec(1e-8,10),10))
-print(np.matmul(matrice('B',10,1e-8,1e-18),psi_0_vec(1e-8,10)))
