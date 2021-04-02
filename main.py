@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 from math import e
 import time
 from scipy.constants import hbar
-
+from matplotlib import pyplot as plt
+from matplotlib.animation import FuncAnimation
+plt.style.use('seaborn-pastel')
 
 
 '''
