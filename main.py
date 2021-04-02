@@ -69,7 +69,6 @@ def psi_0_vec(L,N):
     psi0 = np.empty([N+1,1],complex)
     for i in range(N+1):
         psi0[i]=psi_0(i*a,L)
-        print(i)
     return psi0
 
 
@@ -78,6 +77,8 @@ def v_vec(L,N,h,psi):
     Fonction qui construit le vecteur v à partir de B et psi
 
     Paramètres: L:Longueur de la boîte, N: nombre de pas positionnel, h:grandeur des pas temporelles
+
+    Retourne 
     '''
     a = L/N
     b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
@@ -90,7 +91,7 @@ def v_vec(L,N,h,psi):
     return v
 
 
-def Crank_Nico(h,N, L):
+def Crank_Nico(h,N,L):
     '''
     Fonction qui estime la valeur de psi en fonction du temps et de x avec la méthode de Crank-Nicolson
 
@@ -103,19 +104,17 @@ def Crank_Nico(h,N, L):
     #On crée nos matrices
     A = matrice("A",1000,1e-8,1e-18)
     
+    #On crée notre vecteur initial
+    psi_0 = psi_0_vec(L,N)
 
-    #On créer nos liste vides qui serviront à stocker nos points (eventuellement pour tracer)
-    liste_x = []
+    #On crée nos liste vides qui serviront à stocker nos points (eventuellement pour tracer)
+    liste_x = np.arange(0,L,L/N)
     liste_psi = []
-    liste_t = []
 
-    #On crée un compteur
-    compteur = 0
-
-    #On boucle jusqu'à ce que le compteur atteigne N
-    while compteur < N+1:
-        #On augmente le compteur de 1
-        #on commence en stockant le temps
-        liste_t.append(compteur*h)
+    #On crée un compteur pour le temps
+    t=0
+    
+    while True:
+        
 
 
