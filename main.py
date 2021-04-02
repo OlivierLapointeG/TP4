@@ -1,10 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from math import e
-import scipy.constants as sc
 import time
+from scipy.constants import hbar
 
-def psi(x, L):
+
+
+'''
+Liste de constantes utiles
+'''
+m_e = 9.109e-31 # kg 
+
+def psi_0(x, L):
     '''
     Fonction qui calcule la fonction d'onde d'un électron au temps 0 à une position donné
 
@@ -40,5 +47,4 @@ def Crank_Nico(h,N):
 
     Retourne:
     '''
-
-print(psi_0(1e-8,1000))
+    
