@@ -70,6 +70,21 @@ def matrice(lettre,ran,col,N,L,h):
                     matrice[i][l] = b_2
     return matrice
 
+def v_vec(B,psi,N):
+    '''
+    Fonction qui calcule le vecteur v à partir des valeurs propre de la matrice B, tridiagonale et Toeplitz
+
+    Paramètrees : B, la matrice tridiagonale et Toeplitz dont on cherche les valeurs propres, psi,
+
+    Retourne : le vecteur v
+    '''
+    valpropre = np.empty([N,1],complex)
+    v = np.empty([N, 1], complex)
+    for i in range(N):
+        valpropre[i] = B[i][i]-2*(B[i][i+1]*B[i-1][i])**(1/2)*np.cos((i*np.pi)/(N+1))
+        v[i]=valpropre[i]*psi[i]
+    return v
+
 
 def Crank_Nico(h,N):
     '''
