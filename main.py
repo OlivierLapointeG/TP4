@@ -38,7 +38,7 @@ def matrice(lettre,N,L,h):
     a_1 = 1 + h*1j*hbar/(2*m_e*a**2)
     a_2 = -h*1j*hbar/(4*m_e*a**2)
     b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
-    b_2 = h*1j*hbar/(4*m_e**2)
+    b_2 = h*1j*hbar/(4*m_e*a**2)
     matrice = np.zeros((N,N),complex)
     if lettre == 'A':
         for i in range(N):
@@ -124,7 +124,7 @@ def Crank_Nico(h,N,L):
     '''
     Fonction qui estime la valeur de psi en fonction du temps et de x avec la méthode de Crank-Nicolson
 
-    Paramètres:
+    Paramètres: h: grandeur des itérations temporelles, N: nombre d'itérations positionnelle, L:longueur de la boîte
 
     Retourne:
     '''
@@ -132,9 +132,11 @@ def Crank_Nico(h,N,L):
     
     #On crée nos matrices
     A = matrice("A",1000,1e-8,1e-18)
+    b_1 = 1 - h*1j*hbar/(2*m_e*(L/N)**2)
+    b_2 = h*1j*hbar/(4*m_e*(L/N)**2)
     
     #On crée notre vecteur initial
-    psi_0 = psi_0_vec(L,N)
+    psi = psi_0_vec(L,N)
 
     #On crée nos liste vides qui serviront à stocker nos points (eventuellement pour tracer)
     liste_x = np.arange(0,L,L/N)
@@ -143,4 +145,14 @@ def Crank_Nico(h,N,L):
     #On crée un compteur pour le temps
     t=0
     
+    #On crée le premier état (t=0)
+    etat_1=np.transpose(np.real(psi))
+    liste_psi = list(etat_1)
+
+    #On crée une boucle infini
     while True:
+        #On applique la méhode de thomas pour trouver le deuxième etat
+        v= v_vec(L,N,h,psi)
+        psi = Thomas(A,v)
+        etat = np.transpose(np.real(psi))
+        liste_psi = list(etat)
