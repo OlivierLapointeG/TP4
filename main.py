@@ -35,7 +35,7 @@ def psi_0_vec(L,N):
     '''
     a = L/N
     psi0 = np.empty([N+1,1],complex)
-    for i in range(N+1):
+    for i in range(N):
         psi0[i]=psi_0(i*a,L)
     return psi0
 
@@ -56,7 +56,7 @@ def matrice(lettre,ran,col,N,L,h):
     matrice = np.zeros((ran+1,col+1),complex)
     if lettre == 'A':
         for i in range(ran):
-            for l in range(col+1):
+            for l in range(col):
                 if i == l:
                     matrice[i][l]  = a_1
                 if i == l + 1 or i == l -1:
@@ -95,6 +95,5 @@ def Crank_Nico(h,N):
     Retourne:
     '''
 
-
-print(v_vec(matrice('B',1000,1000,1000,1e-8,1e-18),psi_0_vec(1e-8,1000),1000))
-print(np.matmul(matrice('B',1000,1000,1000,1e-8,1e-18),psi_0_vec(1e-8,1000)))
+print(v_vec(matrice('B',5,5,5,1e-8,1e-18),psi_0_vec(1e-8,5),5))
+print(np.matmul(matrice('B',5,5,5,1e-8,1e-18),psi_0_vec(1e-8,5)))
