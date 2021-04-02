@@ -36,10 +36,10 @@ def psi_0_vec(L,N):
     a = L/N
     psi0 = np.empty([N+1,1],complex)
     for i in range(N):
-        psi0[i]=psi_0(i*a,L)
+        psi0[i]=(psi_0((i)*a,L))
     return psi0
 
-def matrice(lettre,ran,col,N,L,h):
+def matrice(lettre,N,L,h):
     '''
     Fonction crée la matrice A ou B
 
@@ -53,24 +53,24 @@ def matrice(lettre,ran,col,N,L,h):
     a_2 = -h*1j*hbar/(4*m_e*a**2)
     b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
     b_2 = h*1j*hbar/(4*m_e**2)
-    matrice = np.zeros((ran+1,col+1),complex)
+    matrice = np.zeros((N+1,N+1),complex)
     if lettre == 'A':
-        for i in range(ran):
-            for l in range(col):
+        for i in range(N+1):
+            for l in range(N+1):
                 if i == l:
                     matrice[i][l]  = a_1
                 if i == l + 1 or i == l -1:
                     matrice[i][l] = a_2
     if lettre == 'B':
-        for i in range(ran):
-            for l in range(col):
+        for i in range(N+1):
+            for l in range(N+1):
                 if i == l:
                     matrice[i][l]  = b_1
                 if i == l + 1 or i == l -1:
                     matrice[i][l] = b_2
     return matrice
 
-def v_vec(B,psi,N):
+def v_vec(h,psi,N):
     '''
     Fonction qui calcule le vecteur v à partir des valeurs propre de la matrice B, tridiagonale et Toeplitz
 
@@ -78,12 +78,15 @@ def v_vec(B,psi,N):
 
     Retourne : le vecteur v
     '''
+    a = 1e-8/N
     valpropre = np.empty([N+1,1],complex)
     v = np.empty([N+1, 1], complex)
+    b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
+    b_2 = h*1j*hbar/(4*m_e**2)
     for i in range(N):
-        valpropre[i] = B[i][i]-2*(B[i][i+1]*B[i-1][i])**(1/2)*np.cos((i*np.pi)/(N+1))
+        valpropre[i] = b_1-2*(b_2**2)**(1/2)*np.cos(((i)*np.pi)/(N+1))
         v[i]=valpropre[i]*psi[i]
-    return v
+    return matmul()
 
 
 def Crank_Nico(h,N):
