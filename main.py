@@ -27,6 +27,7 @@ def psi_0(x, L):
     return psi
 
 
+<<<<<<< Updated upstream
 def psi_0_vec(L,N):
     '''
     Fonction qui construit le vecteur psi(0) en fonction des pas de distance a
@@ -42,6 +43,8 @@ def psi_0_vec(L,N):
     return psi0
 
 
+=======
+>>>>>>> Stashed changes
 def matrice(lettre,N,L,h):
     '''
     Fonction crée la matrice A ou B
@@ -82,6 +85,7 @@ def v_vec(h,psi,N):
 
     Retourne : le vecteur v
     '''
+<<<<<<< Updated upstream
     a = 1e-8/N
     valpropre = np.empty([N+1,1],complex)
     v = np.empty([N+1, 1], complex)
@@ -91,6 +95,13 @@ def v_vec(h,psi,N):
         valpropre[i] = b_1-2*(b_2**2)**(1/2)*np.cos(((i)*np.pi)/(N+1))
         v[i]=valpropre[i]*psi[i]
     return matmul()
+=======
+    a = L/N
+    psi0 = np.empty([N+1,1],complex)
+    for i in range(N+1):
+        psi0[i]=psi_0(i*a,L)
+    return psi0
+>>>>>>> Stashed changes
 
 
 def Crank_Nico(h,N):
@@ -145,7 +156,20 @@ def Thomas(Matrice, Vecteur):
     return noVect
 
 
+<<<<<<< Updated upstream
 test = np.array([[2.0,6,0, 0], [9,7,3, 0], [0,9,6, 6], [0,0,1,9]])
 Vecteur = np.array([[1.000], [2], [54], [0]])
 print(Thomas(test, Vecteur))
 
+=======
+matriceA = matrice("A", 1000, 1e-8, 1e-18)
+matriceB = matrice("B", 1000, 1e-8, 1e-18)
+psi = psi_0_vec(1e-8, 1000)
+Vecteur = v_vec(1e-8, 1000, 1e-18, psi)
+# X = Thomas(np.real(matriceA), np.real(Vecteur))
+X = Thomas(matriceA, Vecteur)
+pos = np.linspace(0, 1e-8, 1001)
+# plt.plot(np.real(X), np.real(psi))
+plt.plot(pos, np.real(np.transpose(X)[0]))
+plt.show()
+>>>>>>> Stashed changes
