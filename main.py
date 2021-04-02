@@ -115,6 +115,3 @@ def Crank_Nico(h,N,L):
     t=0
     
     while True:
-        
-
-
