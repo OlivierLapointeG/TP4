@@ -27,9 +27,9 @@ def psi_0(x, L):
 
 def matrice(lettre,N,L,h):
     '''
-    Fonction crée la matrice A ou B
+    Fonction qui crée la matrice A ou B
 
-    Paramètres: lettre: choix de matrice à créer, ran:nombre de rangées, col:nombre de colonnes, 
+    Paramètres: lettre: choix de matrice à créer, 
                 N:nombre d'itérations positionnelles, L: longueur de la boîte, h:grandeur des itérations temporelles
 
     Retourne: une matrice tridiagonale qui constitue notre système d'équations différentielles
@@ -90,7 +90,7 @@ def v_vec(L,N,h,psi):
     return v
 
 
-def Crank_Nico(h,N):
+def Crank_Nico(h,N, L):
     '''
     Fonction qui estime la valeur de psi en fonction du temps et de x avec la méthode de Crank-Nicolson
 
@@ -98,4 +98,24 @@ def Crank_Nico(h,N):
 
     Retourne:
     '''
+
+    
+    #On crée nos matrices
+    A = matrice("A",1000,1e-8,1e-18)
+    
+
+    #On créer nos liste vides qui serviront à stocker nos points (eventuellement pour tracer)
+    liste_x = []
+    liste_psi = []
+    liste_t = []
+
+    #On crée un compteur
+    compteur = 0
+
+    #On boucle jusqu'à ce que le compteur atteigne N
+    while compteur < N+1:
+        #On augmente le compteur de 1
+        #on commence en stockant le temps
+        liste_t.append(compteur*h)
+
 
