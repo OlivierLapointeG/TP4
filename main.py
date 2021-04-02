@@ -66,10 +66,29 @@ def psi_0_vec(L,N):
     Retourne : le vecteur psi(0)
     '''
     a = L/N
-    psi0 = np.empty([N,1],complex)
-    for i in range(N):
+    psi0 = np.empty([N+1,1],complex)
+    for i in range(N+1):
         psi0[i]=psi_0(i*a,L)
+        print(i)
     return psi0
+
+
+def v_vec(L,N,h,psi):
+    '''
+    Fonction qui construit le vecteur v à partir de B et psi
+
+    Paramètres: L:Longueur de la boîte, N: nombre de pas positionnel, h:grandeur des pas temporelles
+    '''
+    a = L/N
+    b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
+    b_2 = h*1j*hbar/(4*m_e**2)
+    v = np.empty((N+1,1),complex)
+    v[0] = b_1*psi[0]+b_2*psi[1]
+    v[N] = b_1*psi[N]+b_2*psi[N-1]
+    for i in range(1,N):
+        v[i] = b_1*psi[i]+b_2*(psi[i-1]+psi[i+1])
+    return v
+
 
 def Crank_Nico(h,N):
     '''
