@@ -25,31 +25,31 @@ def psi_0(x, L):
     psi = e**(-(x-x_0)**2/(2*sig**2))*e**(1j*k*x)
     return psi
 
-def matrice(lettre,ran,col,N,L,h):
+def matrice(lettre,N,L,h):
     '''
     Fonction crée la matrice A ou B
 
     Paramètres: lettre: choix de matrice à créer, ran:nombre de rangées, col:nombre de colonnes, 
                 N:nombre d'itérations positionnelles, L: longueur de la boîte, h:grandeur des itérations temporelles
 
-    Retourne: une matrice tridiagonale qui constitue notre système équation différentielle
+    Retourne: une matrice tridiagonale qui constitue notre système d'équations différentielles
     '''
     a = L/N
     a_1 = 1 + h*1j*hbar/(2*m_e*a**2)
     a_2 = -h*1j*hbar/(4*m_e*a**2)
     b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
     b_2 = h*1j*hbar/(4*m_e**2)
-    matrice = np.zeros((ran,col),complex)
+    matrice = np.zeros((N,N),complex)
     if lettre == 'A':
-        for i in range(ran):
-            for l in range(col):
+        for i in range(N):
+            for l in range(N):
                 if i == l:
                     matrice[i][l]  = a_1
                 if i == l + 1 or i == l -1:
                     matrice[i][l] = a_2
     if lettre == 'B':
-        for i in range(ran):
-            for l in range(col):
+        for i in range(N):
+            for l in range(N):
                 if i == l:
                     matrice[i][l]  = b_1
                 if i == l + 1 or i == l -1:
