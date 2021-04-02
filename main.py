@@ -104,19 +104,6 @@ def Crank_Nico(h,N):
 
 
 
-def Crank_Nico():
-    '''
-    Fonction qui estime la valeur de psi en fonction du temps et de x avec la méthode de Crank-Nicolson
-
-    Paramètres:
-
-    Retourne:
-    '''
-
-# for i in range(10000):
-    # print(psi(i,100))
-
-
 def Thomas(Matrice, Vecteur):
     '''
     Fonction qui utilise l'algo de Thomas pour résoudre AX = v
@@ -143,9 +130,4 @@ def Thomas(Matrice, Vecteur):
     for i in reversed(range(taille-1)):
         noVect[i][0] = Vecteur[i][0] - Matrice[i][i+1]*noVect[i+1][0]
     return noVect
-
-
-test = np.array([[2.0,6,0, 0], [9,7,3, 0], [0,9,6, 6], [0,0,1,9]])
-Vecteur = np.array([[1.000], [2], [54], [0]])
-print(Thomas(test, Vecteur))
 
