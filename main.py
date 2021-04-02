@@ -1,8 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt 
-<<<<<<< Updated upstream
-import time 
-=======
+import matplotlib.pyplot as plt
+import time
 from math import e 
 import time 
 
@@ -35,4 +33,4 @@ def Crank_Nico():
 
 # for i in range(10000):
     # print(psi(i,100))
->>>>>>> Stashed changes
+
