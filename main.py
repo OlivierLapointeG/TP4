@@ -34,36 +34,36 @@ def psi_0_vec(L,N):
     Retourne : le vecteur psi(0)
     '''
     a = L/N
-    psi0 = np.empty([N,1],complex)
+    psi0 = np.empty([N+1,1],complex)
     for i in range(N):
         psi0[i]=psi_0(i*a,L)
     return psi0
 
-def matrice(lettre,ran,col,N,L,h):
+def matrice(lettre,N,L,h):
     '''
     Fonction crée la matrice A ou B
 
     Paramètres: lettre: choix de matrice à créer, ran:nombre de rangées, col:nombre de colonnes, 
                 N:nombre d'itérations positionnelles, L: longueur de la boîte, h:grandeur des itérations temporelles
 
-    Retourne: une matrice tridiagonale qui constitue notre système d'équations différentielles
+    Retourne: une matrice tridiagonale qui constitue notre système équation différentielle
     '''
     a = L/N
     a_1 = 1 + h*1j*hbar/(2*m_e*a**2)
     a_2 = -h*1j*hbar/(4*m_e*a**2)
     b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
     b_2 = h*1j*hbar/(4*m_e**2)
-    matrice = np.zeros((ran,col),complex)
+    matrice = np.zeros((N+1,N+1),complex)
     if lettre == 'A':
-        for i in range(ran):
-            for l in range(col):
+        for i in range(N+1):
+            for l in range(N+1):
                 if i == l:
                     matrice[i][l]  = a_1
                 if i == l + 1 or i == l -1:
                     matrice[i][l] = a_2
     if lettre == 'B':
-        for i in range(ran):
-            for l in range(col):
+        for i in range(N+1):
+            for l in range(N+1):
                 if i == l:
                     matrice[i][l]  = b_1
                 if i == l + 1 or i == l -1:
@@ -78,14 +78,17 @@ def v_vec(B,psi,N):
 
     Retourne : le vecteur v
     '''
-    valpropre = np.empty([N,1],complex)
-    v = np.empty([N, 1], complex)
+    valpropre = np.empty([N+1,1],complex)
+    v = np.empty([N+1, 1], complex)
+    b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
+    b_2 = h*1j*hbar/(4*m_e**2)
     for i in range(N):
-        valpropre[i] = B[i][i]-2*(B[i][i+1]*B[i-1][i])**(1/2)*np.cos((i*np.pi)/(N+1))
+        valpropre[i] = b_1-2*(b_2**2)**(1/2)*np.cos((i*np.pi)/(N+1))
         v[i]=valpropre[i]*psi[i]
     return v
-    
-def Crank_Nico(h,N,L):
+
+
+def Crank_Nico(h,N):
     '''
     Fonction qui estime la valeur de psi en fonction du temps et de x avec la méthode de Crank-Nicolson
 
@@ -93,9 +96,7 @@ def Crank_Nico(h,N,L):
 
     Retourne:
     '''
-    compteur = 0
-    while compteur < N
-    compteur += 1
 
 
-
+print(v_vec(matrice('B',10,10,10,1e-8,1e-18),psi_0_vec(1e-8,10),10))
+print(np.matmul(matrice('B',10,10,10,1e-8,1e-18),psi_0_vec(1e-8,10)))
