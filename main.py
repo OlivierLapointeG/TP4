@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from math import e 
-import time 
+from math import e
+import scipy.constants as sc
+import time
 
 def psi(x, L):
     '''
@@ -17,9 +18,21 @@ def psi(x, L):
     psi = e**(-(x-x_0)**2/(2*sig**2))*e**(1j*k*x)
     return psi
 
+def psi_0(L,N):
+    '''
+    Fonction qui construit le vecteur psi(0) en fonction des pas de distance a
 
+    Paramètres : L, la longueur de la boîte unidimensionnelle, N, le nombre de pas dans la boîte
 
-def Crank_Nico():
+    Retourne : le vecteur psi(0)
+    '''
+    a = L/N
+    psi0 = np.empty([N,1],complex)
+    for i in range(N):
+        psi0[i]=psi(i*a,L)
+    return psi0
+
+def Crank_Nico(h,N):
     '''
     Fonction qui estime la valeur de psi en fonction du temps et de x avec la méthode de Crank-Nicolson
 
@@ -28,5 +41,4 @@ def Crank_Nico():
     Retourne:
     '''
 
-for i in range(10000):
-    print(psi(i,100))
+print(psi_0(1e-8,1000))
