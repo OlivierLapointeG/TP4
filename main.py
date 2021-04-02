@@ -46,7 +46,7 @@ def matrice(lettre,ran,col,N,L,h):
     Paramètres: lettre: choix de matrice à créer, ran:nombre de rangées, col:nombre de colonnes, 
                 N:nombre d'itérations positionnelles, L: longueur de la boîte, h:grandeur des itérations temporelles
 
-    Retourne: une matrice tridiagonale qui constitue notre système équation différentielle
+    Retourne: une matrice tridiagonale qui constitue notre système d'équations différentielles
     '''
     a = L/N
     a_1 = 1 + h*1j*hbar/(2*m_e*a**2)
@@ -84,9 +84,8 @@ def v_vec(B,psi,N):
         valpropre[i] = B[i][i]-2*(B[i][i+1]*B[i-1][i])**(1/2)*np.cos((i*np.pi)/(N+1))
         v[i]=valpropre[i]*psi[i]
     return v
-
-
-def Crank_Nico(h,N):
+    
+def Crank_Nico(h,N,L):
     '''
     Fonction qui estime la valeur de psi en fonction du temps et de x avec la méthode de Crank-Nicolson
 
@@ -94,5 +93,9 @@ def Crank_Nico(h,N):
 
     Retourne:
     '''
+    compteur = 0
+    while compteur < N
+    compteur += 1
+
 
 
