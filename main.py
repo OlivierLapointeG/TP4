@@ -1,11 +1,8 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from math import e
 import time
 from scipy.constants import hbar
 from matplotlib import pyplot as plt
-from matplotlib.animation import FuncAnimation
-plt.style.use('seaborn-pastel')
 
 
 '''
@@ -144,3 +141,20 @@ def Thomas(Matrice, Vecteur):
     for i in reversed(range(taille-1)):
         noVect[i][0] = Vecteur[i][0] - Matrice[i][i+1]*noVect[i+1][0]
     return noVect
+
+def Animation():
+    x = np.linspace(0, 10, 100)
+    y = np.cos(x)
+
+    fig = plt.figure()
+
+    for p in range(50):
+        p = 3
+        updated_x = x + p
+        updated_y = np.cos(x)
+        plt.plot(updated_x, updated_y)
+        plt.draw()
+        x = updated_x
+        y = updated_y
+        plt.pause(0.2)
+        fig.clear()
