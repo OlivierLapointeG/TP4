@@ -11,6 +11,7 @@ Liste de constantes utiles
 '''
 m_e = 9.109e-31 # kg 
 
+
 def psi_0(x, L):
     '''
     Fonction qui calcule la fonction d'onde d'un électron au temps 0 à une position donné
@@ -25,6 +26,7 @@ def psi_0(x, L):
     psi = e**(-(x-x_0)**2/(2*sig**2))*e**(1j*k*x)
     return psi
 
+
 def psi_0_vec(L,N):
     '''
     Fonction qui construit le vecteur psi(0) en fonction des pas de distance a
@@ -38,6 +40,7 @@ def psi_0_vec(L,N):
     for i in range(N):
         psi0[i]=(psi_0((i)*a,L))
     return psi0
+
 
 def matrice(lettre,N,L,h):
     '''
@@ -70,6 +73,7 @@ def matrice(lettre,N,L,h):
                     matrice[i][l] = b_2
     return matrice
 
+
 def v_vec(h,psi,N):
     '''
     Fonction qui calcule le vecteur v à partir des valeurs propre de la matrice B, tridiagonale et Toeplitz
@@ -100,3 +104,36 @@ def Crank_Nico(h,N):
 
 print(v_vec(matrice('B',5,5,5,1e-8,1e-18),psi_0_vec(1e-8,5),5))
 print(np.matmul(matrice('B',5,5,5,1e-8,1e-18),psi_0_vec(1e-8,5)))
+
+
+def Thomas(Matrice, Vecteur):
+    '''
+    Fonction qui utilise l'algo de Thomas pour résoudre AX = v
+
+    Paramètres: Matrice est un matrice carré tridiagonale, Vecteur est une matrice vecteur
+
+    Retourne: Un vecteur correspondant à X
+
+    NOTE: Jesus saith unto him, Thomas, because thou hast seen me, thou hast believed:
+    blessed are they that have not seen, and yet have believed
+    '''
+    taille = len(Matrice)
+    noVect = np.empty([taille,1])
+    # Boucle qui fait la réduction de Gauss simplifiée sur la matrice et le vecteur.
+    for i in range(taille-1):
+        Vecteur[i][0] = Vecteur[i][0]/ Matrice[i][i]
+        Matrice[i] = Matrice[i]/ Matrice[i][i]
+        Vecteur[i+1][0] = Vecteur[i+1][0] - Matrice[i+1][i]*Vecteur[i][0]
+        Matrice[i+1] = Matrice[i+1]-(Matrice[i+1][i]* Matrice[i])
+    Vecteur[taille-1][0] = Vecteur[taille-1][0]/ Matrice[taille-1][taille-1]
+    Matrice[taille-1] = Matrice[taille-1] / Matrice[taille-1][taille-1]
+    noVect[taille - 1][0] = Vecteur[taille - 1][0]
+    # Boucle qui construit notre vecteur de sortie.
+    for i in reversed(range(taille-1)):
+        noVect[i][0] = Vecteur[i][0] - Matrice[i][i+1]*noVect[i+1][0]
+    return noVect
+
+
+test = np.array([[2.0,6,0, 0], [9,7,3, 0], [0,9,6, 6], [0,0,1,9]])
+Vecteur = np.array([[1.000], [2], [54], [0]])
+print(Thomas(test, Vecteur))
