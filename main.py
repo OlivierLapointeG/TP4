@@ -216,6 +216,35 @@ def Thomas(Matrice, Vecteur):
     for i in reversed(range(taille-1)):
         noVect[i][0] = Vecteur[i][0] - Matrice[i][i+1]*noVect[i+1][0]
     return noVect
-    
+
+
+def Thomas2(Matrice, Vecteur):
+    '''
+    Fonction qui utilise l'algo de Thomas pour résoudre AX = v
+
+    Paramètres: Matrice est un matrice carré tridiagonale, Vecteur est une matrice vecteur
+
+    Retourne: Un vecteur correspondant à X
+
+    NOTE: Jesus saith unto him, Thomas, because thou hast seen me, thou hast believed:
+    blessed are they that have not seen, and yet have believed
+    '''
+    taille = len(Matrice)
+    noVect = np.empty([taille, 1])
+
+    # Boucle qui fait la réduction de Gauss simplifiée sur la matrice et le vecteur.
+    for i in range(taille - 1):
+        Vecteur[i][0] = Vecteur[i][0] / Matrice[i][i]
+        Matrice[i] = Matrice[i] / Matrice[i][i]
+        Vecteur[i + 1][0] = Vecteur[i + 1][0] - Matrice[i + 1][i] * Vecteur[i][0]
+        Matrice[i + 1] = Matrice[i + 1] - (Matrice[i + 1][i] * Matrice[i])
+    Vecteur[taille - 1][0] = Vecteur[taille - 1][0] / Matrice[taille - 1][taille - 1]
+    Matrice[taille - 1] = Matrice[taille - 1] / Matrice[taille - 1][taille - 1]
+    noVect[taille - 1][0] = Vecteur[taille - 1][0]
+
+    # Boucle qui construit notre vecteur de sortie.
+    for i in reversed(range(taille - 1)):
+        noVect[i][0] = Vecteur[i][0] - Matrice[i][i + 1] * noVect[i + 1][0]
+    return noVect
 
 Crank_Nico(1e-18,1000,1e-8)
