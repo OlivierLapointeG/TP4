@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from math import e
 import time
 from scipy.constants import hbar
-
+from matplotlib import animation
 
 '''
 Liste de constantes utiles
@@ -98,10 +98,38 @@ def v_vec(L,N,h,psi):
         v[i] = b_1*psi[i]+b_2*(psi[i-1]+psi[i+1])
     return v
 
+def Thomas(MatriceIni, VecteurIni):
+    '''
+    Fonction qui utilise l'algo de Thomas pour résoudre AX = v
+
+    Paramètres: Matrice est un matrice carré tridiagonale, Vecteur est une matrice vecteur
+
+    Retourne: Un vecteur correspondant à X
+
+    NOTE: Jesus saith unto him, Thomas, because thou hast seen me, thou hast believed:
+    blessed are they that have not seen, and yet have believed
+    '''
+    taille = len(MatriceIni)
+    Matrice = np.copy(MatriceIni)
+    Vecteur = np.copy(VecteurIni)
+
+    # Boucle qui fait la réduction de Gauss simplifiée sur la matrice et le vecteur.
+    for i in range(taille - 1):
+        Vecteur[i][0] /= (Matrice[i][i])
+        Matrice[i] /= (Matrice[i][i])
+        Vecteur[i + 1][0] -= (Matrice[i + 1][i]) * (Vecteur[i][0])
+        Matrice[i + 1] -= ((Matrice[i + 1][i]) * (Matrice[i]))
+    Vecteur[taille - 1][0] /= (Matrice[taille - 1][taille - 1])
+    Matrice[taille - 1] /= (Matrice[taille - 1][taille - 1])
+
+    # Boucle qui construit notre vecteur de sortie.
+    for i in reversed(range(taille - 1)):
+        Vecteur[i][0] -= (Matrice[i][i + 1]) * (Vecteur[i + 1][0])
+    return Vecteur
 
 
 
-def Crank_Nico(h,N,L):
+def Crank_Nico(h,N,L,m):
     '''
     Fonction qui estime la valeur de psi en fonction du temps et de x avec la méthode de Crank-Nicolson
 
@@ -110,7 +138,7 @@ def Crank_Nico(h,N,L):
     Retourne:
     '''
     #On crée une figure pyplot
-    fig = plt.figure()
+    #fig = plt.figure()
     
     #On crée nos matrices
     A = matrice("A",N,1e-8,1e-18)
@@ -129,24 +157,40 @@ def Crank_Nico(h,N,L):
     t=0
     
     #On crée le premier état (t=0)
-    etat_1=np.transpose(psi)
+    etat_1=np.transpose(psi)[0]
     liste_psi = etat_1
     liste_etats.append(liste_psi)
 
     #On crée une boucle infini
-    while t<10000e-18:
+    while t<m*e-18:
         #On augmente notre compteur de temps de h
         t += h
         #On applique la méhode de thomas pour trouver le deuxième etat
         v= v_vec(L,N,h,psi)
-        psi = np.linalg.solve(A,v)
+        psi = Thomas(A,v)
 
         etat = np.transpose(psi)[0]
         liste_psi = etat
 
         liste_etats.append(liste_psi)
-        print(t)
     return liste_etats
 
-plt.plot(Crank_Nico(1e-18,1000,1e-8)[0])
+
+liste_y = Crank_Nico(1e-18,1000,1e-8,1000)
+liste_x = [0]
+for i in range(1000):
+    liste_x.append(liste_x[-1]+((1e-8)/1000))
+
+fig = plt.figure()
+
+
+def animate(i):
+    x = liste_x
+    y = np.real(liste_y[i]) 
+    fig.clear() 
+    plt.plot(x,y)
+    plt.plot(x,y)
+    plt.ylim(-1,1)
+
+ani = animation.FuncAnimation(fig, animate, interval=1,blit=False)
 plt.show()
