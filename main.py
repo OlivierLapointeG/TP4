@@ -5,7 +5,6 @@ import time
 from scipy.constants import hbar
 
 
-
 '''
 Liste de constantes utiles
 '''
@@ -22,8 +21,9 @@ def psi_0(x, L):
     x_0 = L/2
     sig = 1e-10 #en mètres
     k = 5e10 # en 1/mètres
-    psi = e**(-(x-x_0)**2/(2*sig**2))*e**(1j*k*x)
+    psi = np.exp(-(x-x_0)**2/(2*sig**2))*np.exp(1j*k*x)
     return psi
+
 
 def matrice(lettre,N,L,h):
     '''
@@ -71,6 +71,14 @@ def psi_0_vec(L,N):
         psi0[i]=psi_0(i*a,L)
     return psi0
 
+'''
+liste_x = np.arange(0,1e-8,1e-8/(1001))
+liste_psi = []
+for i in liste_x:
+    liste_psi.append(psi_0(i,1e-8))
+plt.plot(liste_x,liste_psi)
+plt.show()
+'''
 
 def v_vec(L,N,h,psi):
     '''
@@ -82,7 +90,7 @@ def v_vec(L,N,h,psi):
     '''
     a = L/N
     b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
-    b_2 = h*1j*hbar/(4*m_e**2)
+    b_2 = h*1j*hbar/(4*m_e*a**2)
     v = np.empty((N+1,1),complex)
     v[0] = b_1*psi[0]+b_2*psi[1]
     v[N] = b_1*psi[N]+b_2*psi[N-1]
@@ -150,6 +158,7 @@ def Crank_Nico(h,N,L):
 
     #On plot le premier etat
     plt.plot(liste_x,liste_psi[0])
+    plt.ylim(-1,1)
     plt.draw()
     plt.pause(0.2)
     fig.clear()
@@ -167,7 +176,7 @@ def Crank_Nico(h,N,L):
         #On plot le premier etat
         plt.plot(liste_x,liste_psi[0])
         plt.draw()
-        plt.pause(0.001)
+        plt.pause(0.0000000001)
         fig.clear()
 
 Crank_Nico(1e-18,1000,1e-8)
