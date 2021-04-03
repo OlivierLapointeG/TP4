@@ -145,14 +145,14 @@ def Crank_Nico(h,N,L):
         v= v_vec(L,N,h,psi)
         psi = np.linalg.solve(A,v)
 
-        etat = np.transpose(np.real(psi))[0]
+        etat = np.transpose(psi)[0]
         liste_psi = etat
 
-        #On plot le premier etat
-        #plt.plot(liste_x,liste_psi)
-        #plt.ylim(-1.1,1.1)
-        #plt.draw()
-        #plt.pause(0.0000000001)
-        #fig.clear()
+        On plot le premier etat
+        plt.plot(liste_x,liste_psi)
+        plt.ylim(-1.1,1.1)
+        plt.draw()
+        plt.pause(0.0000000001)
+        fig.clear()
 
 
