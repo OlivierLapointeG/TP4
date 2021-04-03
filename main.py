@@ -141,7 +141,7 @@ def Crank_Nico(h,N,L):
         t += h
         #On applique la méhode de thomas pour trouver le deuxième etat
         v= v_vec(L,N,h,psi)
-        psi = np.linalg.solve(A,v)
+        psi = Thomas(A,v)
 
         etat = np.transpose(np.real(psi))
         liste_psi = etat
@@ -182,17 +182,5 @@ def Thomas(MatriceIni, VecteurIni):
         Vecteur[i][0] -= (Matrice[i][i + 1]) * (Vecteur[i + 1][0])
     return Vecteur
 
-
-N = 1000
-matriceA = matrice("A", N, 1e-8, 1e-18)
-psi = psi_0_vec(1e-8, N)
-Vecteur = v_vec(1e-8, N, 1e-18, psi)
-pos2 = np.linalg.solve(matriceA, Vecteur)
-pos1 = Thomas(matriceA, Vecteur)
-x = np.linspace(0, 1e-8, N + 1)
-plt.plot(x, pos2, c="b")  # linalg
-plt.plot(x, pos1, c="r", linestyle="--")  # thomas
-plt.show()
-    
 
 Crank_Nico(1e-18,1000,1e-8)
