@@ -123,6 +123,7 @@ def Crank_Nico(h,N,L):
     for i in range(N):
         liste_x.append(liste_x[-1]+(L/N))
     liste_psi = []
+    liste_etats = []
 
     #On crée un compteur pour le temps
     t=0
@@ -130,15 +131,10 @@ def Crank_Nico(h,N,L):
     #On crée le premier état (t=0)
     etat_1=np.transpose(psi)
     liste_psi = etat_1
+    liste_etats.append(liste_psi)
 
-    #On plot le premier etat
-    plt.plot(liste_x,liste_psi[0])
-    plt.ylim(-1.1,1.1)
-    plt.draw()
-    plt.pause(0.0000001)
-    fig.clear()
     #On crée une boucle infini
-    while True:
+    while t<10000e-18:
         #On augmente notre compteur de temps de h
         t += h
         #On applique la méhode de thomas pour trouver le deuxième etat
@@ -148,11 +144,9 @@ def Crank_Nico(h,N,L):
         etat = np.transpose(psi)[0]
         liste_psi = etat
 
-        On plot le premier etat
-        plt.plot(liste_x,liste_psi)
-        plt.ylim(-1.1,1.1)
-        plt.draw()
-        plt.pause(0.0000000001)
-        fig.clear()
+        liste_etats.append(liste_psi)
+        print(t)
+    return liste_etats
 
-
+plt.plot(Crank_Nico(1e-18,1000,1e-8)[0])
+plt.show()
