@@ -110,16 +110,21 @@ def Crank_Nico(h,N,L):
     '''
 
     #On crée une figure pyplot
-    fig = plt.figure()
+    plt.ion()
+
+    figure, ax = plt.subplots(figsize=(8, 6))
     
     #On crée nos matrices
-    A = matrice("A",1000,1e-8,1e-18)
+    A = matrice("A",N,1e-8,1e-18)
     
     #On crée notre vecteur initial
     psi = psi_0_vec(L,N)
 
     #On crée nos liste vides qui serviront à stocker nos points (eventuellement pour tracer)
     liste_x = np.arange(0,L,L/(N+1))
+    liste_z =[]
+    for i in range(len(liste_x)):
+        liste_z.append(0)
     liste_psi = []
 
     #On crée un compteur pour le temps
@@ -127,14 +132,15 @@ def Crank_Nico(h,N,L):
     
     #On crée le premier état (t=0)
     etat_1=np.transpose(np.real(psi))
+    etat_2 = np.transpose(np.imag(psi))
     liste_psi = etat_1
+    liste_zim = etat_2
 
     #On plot le premier etat
-    plt.plot(liste_x,liste_psi[0])
-    plt.ylim(-1,1)
-    plt.draw()
+    ax = plt.axes(projection='3d')
+    line = ax.plot3D(liste_x, liste_psi[0],  liste_zim[0], c='blue')
+    plt.show()
     plt.pause(0.2)
-    fig.clear()
     #On crée une boucle infini
     while True:
         #On augmente notre compteur de temps de h
@@ -142,16 +148,17 @@ def Crank_Nico(h,N,L):
         #On applique la méhode de thomas pour trouver le deuxième etat
         v= v_vec(L,N,h,psi)
         psi = np.linalg.solve(A,v)
-
+        plt.ylim(-1, 1)
         etat = np.transpose(np.real(psi))
+        etat2 = np.transpose(np.imag(psi))
         liste_psi = etat
-
+        liste_zim = etat2
         #On plot le premier etat
-        plt.plot(liste_x,liste_psi[0])
-        plt.draw()
-        plt.pause(0.0000000001)
-        fig.clear()
-
+        line = ax.plot3D(liste_x, liste_psi[0],  liste_zim[0], c='blue')
+        figure.show()
+        figure.canvas.flush_events()
+        time.sleep(0.00001)
+        ax.cla()
 
 def Thomas(MatriceIni, VecteurIni):
     '''
@@ -183,16 +190,33 @@ def Thomas(MatriceIni, VecteurIni):
     return Vecteur
 
 
-N = 1000
-matriceA = matrice("A", N, 1e-8, 1e-18)
-psi = psi_0_vec(1e-8, N)
-Vecteur = v_vec(1e-8, N, 1e-18, psi)
-pos2 = np.linalg.solve(matriceA, Vecteur)
-pos1 = Thomas(matriceA, Vecteur)
-x = np.linspace(0, 1e-8, N + 1)
-plt.plot(x, pos2, c="b")  # linalg
-plt.plot(x, pos1, c="r", linestyle="--")  # thomas
-plt.show()
-    
+def Thomas2(Matrice, Vecteur):
+    '''
+    Fonction qui utilise l'algo de Thomas pour résoudre AX = v
+
+    Paramètres: Matrice est un matrice carré tridiagonale, Vecteur est une matrice vecteur
+
+    Retourne: Un vecteur correspondant à X
+
+    NOTE: Jesus saith unto him, Thomas, because thou hast seen me, thou hast believed:
+    blessed are they that have not seen, and yet have believed
+    '''
+    taille = len(Matrice)
+    noVect = np.empty([taille, 1])
+
+    # Boucle qui fait la réduction de Gauss simplifiée sur la matrice et le vecteur.
+    for i in range(taille - 1):
+        Vecteur[i][0] = Vecteur[i][0] / Matrice[i][i]
+        Matrice[i] = Matrice[i] / Matrice[i][i]
+        Vecteur[i + 1][0] = Vecteur[i + 1][0] - Matrice[i + 1][i] * Vecteur[i][0]
+        Matrice[i + 1] = Matrice[i + 1] - (Matrice[i + 1][i] * Matrice[i])
+    Vecteur[taille - 1][0] = Vecteur[taille - 1][0] / Matrice[taille - 1][taille - 1]
+    Matrice[taille - 1] = Matrice[taille - 1] / Matrice[taille - 1][taille - 1]
+    noVect[taille - 1][0] = Vecteur[taille - 1][0]
+
+    # Boucle qui construit notre vecteur de sortie.
+    for i in reversed(range(taille - 1)):
+        noVect[i][0] = Vecteur[i][0] - Matrice[i][i + 1] * noVect[i + 1][0]
+    return noVect
 
 Crank_Nico(1e-18,1000,1e-8)
