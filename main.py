@@ -39,17 +39,17 @@ def matrice(lettre,N,L,h):
     a_2 = -h*1j*hbar/(4*m_e*a**2)
     b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
     b_2 = h*1j*hbar/(4*m_e*a**2)
-    matrice = np.zeros((N,N),complex)
+    matrice = np.zeros((N+1,N+1),complex)
     if lettre == 'A':
-        for i in range(N):
-            for l in range(N):
+        for i in range(N+1):
+            for l in range(N+1):
                 if i == l:
                     matrice[i][l]  = a_1
                 if i == l + 1 or i == l -1:
                     matrice[i][l] = a_2
     if lettre == 'B':
-        for i in range(N):
-            for l in range(N):
+        for i in range(N+1):
+            for l in range(N+1):
                 if i == l:
                     matrice[i][l]  = b_1
                 if i == l + 1 or i == l -1:
@@ -128,18 +128,17 @@ def Crank_Nico(h,N,L):
 
     Retourne:
     '''
-
+    #On crée une figure pyplot
+    fig = plt.figure()
     
     #On crée nos matrices
     A = matrice("A",1000,1e-8,1e-18)
-    b_1 = 1 - h*1j*hbar/(2*m_e*(L/N)**2)
-    b_2 = h*1j*hbar/(4*m_e*(L/N)**2)
     
     #On crée notre vecteur initial
     psi = psi_0_vec(L,N)
 
     #On crée nos liste vides qui serviront à stocker nos points (eventuellement pour tracer)
-    liste_x = np.arange(0,L,L/N)
+    liste_x = np.arange(0,L,L/(N+1))
     liste_psi = []
 
     #On crée un compteur pour le temps
@@ -147,12 +146,28 @@ def Crank_Nico(h,N,L):
     
     #On crée le premier état (t=0)
     etat_1=np.transpose(np.real(psi))
-    liste_psi = list(etat_1)
+    liste_psi = etat_1
 
+    #On plot le premier etat
+    plt.plot(liste_x,liste_psi[0])
+    plt.draw()
+    plt.pause(0.2)
+    fig.clear()
     #On crée une boucle infini
     while True:
+        #On augmente notre compteur de temps de h
+        t += h
         #On applique la méhode de thomas pour trouver le deuxième etat
         v= v_vec(L,N,h,psi)
-        psi = Thomas(A,v)
+        psi = np.linalg.solve(A,v)
+
         etat = np.transpose(np.real(psi))
-        liste_psi = list(etat)
+        liste_psi = etat
+
+        #On plot le premier etat
+        plt.plot(liste_x,liste_psi[0])
+        plt.draw()
+        plt.pause(0.001)
+        fig.clear()
+
+Crank_Nico(1e-18,1000,1e-8)
