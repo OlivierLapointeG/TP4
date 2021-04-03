@@ -99,7 +99,7 @@ def v_vec(L,N,h,psi):
     return v
 
 
-def Thomas(Matrice, Vecteur):
+def Thomas(Matrice, Vecteur, N):
     '''
     Fonction qui utilise l'algo de Thomas pour résoudre AX = v
 
@@ -110,23 +110,57 @@ def Thomas(Matrice, Vecteur):
     NOTE: Jesus saith unto him, Thomas, because thou hast seen me, thou hast believed:
     blessed are they that have not seen, and yet have believed
     '''
-    taille = len(Matrice)
-    noVect = np.empty([taille,1])
+    noVect = np.empty([N+1,1])
 
     # Boucle qui fait la réduction de Gauss simplifiée sur la matrice et le vecteur.
-    for i in range(taille-1):
+    for i in range(1,N):
         Vecteur[i][0] = Vecteur[i][0]/ Matrice[i][i]
         Matrice[i] = Matrice[i]/ Matrice[i][i]
         Vecteur[i+1][0] = Vecteur[i+1][0] - Matrice[i+1][i]*Vecteur[i][0]
         Matrice[i+1] = Matrice[i+1]-(Matrice[i+1][i]* Matrice[i])
-    Vecteur[taille-1][0] = Vecteur[taille-1][0]/ Matrice[taille-1][taille-1]
-    Matrice[taille-1] = Matrice[taille-1] / Matrice[taille-1][taille-1]
-    noVect[taille - 1][0] = Vecteur[taille - 1][0]
+    Vecteur[-1][0] = Vecteur[-1][0]/ Matrice[-1][-1]
+    Matrice[-1] = Matrice[-1] / Matrice[-1][-1]
+    noVect[- 1][0] = Vecteur[- 1][0]
     
     # Boucle qui construit notre vecteur de sortie.
-    for i in reversed(range(taille-1)):
+    for i in range(N-2,-1,-1):
         noVect[i][0] = Vecteur[i][0] - Matrice[i][i+1]*noVect[i+1][0]
     return noVect
+
+
+
+
+def Thomas2(Vecteur,h,L,N):
+
+    #On transpose notre vecteur pour la forme
+    Vecteur = np.transpose(Vecteur)[0]
+    # on ramène nos éléments de matrice
+    a = L/N
+    a_1 = 1 + h*1j*hbar/(2*m_e*a**2)
+    a_2 = -h*1j*hbar/(4*m_e*a**2)
+
+    #on crée notre nouvelle matrice
+    l2 = [a_2 for i in range(N+1)]
+    l2[0] = 0
+    l3 = [a_1 for i in range(N+1)]
+    l4 = [a_2 for i in range(N+1)]
+    l4[N] = 0
+    print(len(l4))
+    #élimination gaussienne
+    for i in range(1, N+1):
+        m = a_2/a_1
+        l3[i] = a_1 - m*a_2 
+        Vecteur[i] = Vecteur[i] - m*Vecteur[i-1]
+
+    psi = np.zeros((1,1001),complex)[0]
+    psi[-1] = Vecteur[-1]/l3[-1]
+
+    #backward substitution
+    for i in range(N-1,-1,-1):
+        psi[i] = (Vecteur[i]-a_2*psi[i+1])/l3[i]
+    
+    return np.transpose(psi)
+
 
 def Crank_Nico(h,N,L):
     '''
@@ -140,27 +174,29 @@ def Crank_Nico(h,N,L):
     fig = plt.figure()
     
     #On crée nos matrices
-    A = matrice("A",1000,1e-8,1e-18)
+    A = matrice("A",N,1e-8,1e-18)
     
     #On crée notre vecteur initial
     psi = psi_0_vec(L,N)
 
     #On crée nos liste vides qui serviront à stocker nos points (eventuellement pour tracer)
-    liste_x = np.arange(0,L,L/(N+1))
+    liste_x = [0]
+    for i in range(N):
+        liste_x.append(liste_x[-1]+(L/N))
     liste_psi = []
 
     #On crée un compteur pour le temps
     t=0
     
     #On crée le premier état (t=0)
-    etat_1=np.transpose(np.real(psi))
+    etat_1=np.transpose(psi)
     liste_psi = etat_1
 
     #On plot le premier etat
     plt.plot(liste_x,liste_psi[0])
-    plt.ylim(-1,1)
+    plt.ylim(-1.1,1.1)
     plt.draw()
-    plt.pause(0.2)
+    plt.pause(0.0000001)
     fig.clear()
     #On crée une boucle infini
     while True:
@@ -170,13 +206,59 @@ def Crank_Nico(h,N,L):
         v= v_vec(L,N,h,psi)
         psi = np.linalg.solve(A,v)
 
-        etat = np.transpose(np.real(psi))
+        etat = np.transpose(np.real(psi))[0]
         liste_psi = etat
 
         #On plot le premier etat
-        plt.plot(liste_x,liste_psi[0])
-        plt.draw()
-        plt.pause(0.0000000001)
-        fig.clear()
+        #plt.plot(liste_x,liste_psi)
+        #plt.ylim(-1.1,1.1)
+        #plt.draw()
+        #plt.pause(0.0000000001)
+        #fig.clear()
 
-Crank_Nico(1e-18,1000,1e-8)
+def Thomas3(Vecteur,h,L,N):
+
+    #On transpose notre vecteur pour la forme
+    d = np.transpose(Vecteur)[0]
+    
+    # on ramène nos éléments de matrice
+    a = L/N
+    a_1 = 1 + h*1j*hbar/(2*m_e*a**2)
+    a_2 = -h*1j*hbar/(4*m_e*a**2)
+
+    #on crée notre nouvelle matrice
+    a = [a_2 for i in range(N+1)]
+    a[0] = 0
+    b = [a_1 for i in range(N+1)]
+    c = [a_2 for i in range(N+1)]
+    c[N] = 0
+
+    #On fait une "élimination gaussienne"
+    for i in range(1,N+1):
+            m = a_2 / a_1
+            b[i] = b[i] - m*c[i-1]
+            d[i] = d[i] - m*d[i-1]
+
+    #On crée notre psi
+    psi = []
+    for i in range(N+1):
+        psi.append(d[i]/b[i])
+
+    #Substitution inversée
+    for i in range(N-1,-1,-1):
+        psi[i] = (d[i]-c[i]*psi[i+1])/b[i]
+    return(psi)
+
+#Crank_Nico(1e-18,1000,1e-8)
+A = matrice("A",1000,1e-8,1e-18)
+psi = psi_0_vec(1e-8,1000)
+v = v_vec(1e-8,1000,1e-18,psi)
+a = Thomas3(v,1e-18,1e-8,1000)
+b = np.linalg.solve(A,v)
+c = Thomas2(v,1e-18,1e-8,1000)
+d = Thomas(A,v,1000)
+plt.plot(b,c='blue')
+plt.plot(a,c='orange')
+plt.plot(c,c='grey')
+plt.plot(d,c='magenta')
+plt.show()
