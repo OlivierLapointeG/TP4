@@ -151,6 +151,9 @@ def Crank_Nico(h,N,L):
 
     #On crée nos liste vides qui serviront à stocker nos points (eventuellement pour tracer)
     liste_x = np.arange(0,L,L/(N+1))
+    liste_z =[]
+    for i in range(len(liste_x)):
+        liste_z.append(0)
     liste_psi = []
 
     #On crée un compteur pour le temps
@@ -158,11 +161,14 @@ def Crank_Nico(h,N,L):
     
     #On crée le premier état (t=0)
     etat_1=np.transpose(np.real(psi))
+    etat_2 = np.transpose(np.imag(psi))
     liste_psi = etat_1
+    liste_zim = etat_2
 
     #On plot le premier etat
-    line1, = ax.plot(liste_x,liste_psi[0])
-    plt.ylim(-1,1)
+    ax = plt.axes(projection='3d')
+    line = ax.plot3D(liste_x, liste_psi[0],  liste_z, c='blue')
+    plt.show()
     plt.pause(0.2)
     #On crée une boucle infini
     while True:
@@ -173,10 +179,11 @@ def Crank_Nico(h,N,L):
         psi = np.linalg.solve(A,v)
         plt.ylim(-1, 1)
         etat = np.transpose(np.real(psi))
+        etat2 = np.transpose(np.imag(psi))
         liste_psi = etat
-
+        liste_zim = etat2
         #On plot le premier etat
-        line1.set_ydata(liste_psi[0])
+        line = ax.plot3D(liste_x, liste_psi[0],  liste_z, c='blue')
         figure.show()
         figure.canvas.flush_events()
         time.sleep(0.00001)
