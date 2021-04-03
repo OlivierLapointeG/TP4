@@ -114,7 +114,6 @@ def Thomas(MatriceIni, VecteurIni):
     blessed are they that have not seen, and yet have believed
     '''
     taille = len(MatriceIni)
-    noVect = np.empty([taille,1])
     Matrice = np.copy(MatriceIni)
     Vecteur = np.copy(VecteurIni)
 
@@ -123,15 +122,14 @@ def Thomas(MatriceIni, VecteurIni):
         Vecteur[i][0] /= (Matrice[i][i])
         Matrice[i] /= (Matrice[i][i])
         Vecteur[i+1][0] -= (Matrice[i+1][i])*(Vecteur[i][0])
-        Matrice[i+1] -= ((Matrice[i+1][i])* (Matrice[i]))
+        Matrice[i+1] -= ((Matrice[i+1][i])*(Matrice[i]))
     Vecteur[taille-1][0] /= (Matrice[taille-1][taille-1])
     Matrice[taille-1] /= (Matrice[taille-1][taille-1])
-    noVect[taille - 1][0] = (Vecteur[taille - 1][0])
     
     # Boucle qui construit notre vecteur de sortie.
     for i in reversed(range(taille-1)):
-        noVect[i][0] = (Vecteur[i][0]) - (Matrice[i][i+1])*(noVect[i+1][0])
-    return noVect
+        Vecteur[i][0] -= (Matrice[i][i+1])*(Vecteur[i+1][0])
+    return Vecteur
 
 
 N=1000
@@ -141,8 +139,8 @@ Vecteur = v_vec(1e-8, N,1e-18,psi)
 pos2 = np.linalg.solve(matriceA, Vecteur)
 pos1 = Thomas(matriceA, Vecteur)
 x = np.linspace(0, 1e-8, N+1)
-plt.plot(x, pos1, c="r")
-plt.plot(x, pos2, c="b")
+plt.plot(x, pos2, c="b") # linalg
+plt.plot(x, pos1, c="r") # thomas
 plt.show()
 
 
