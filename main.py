@@ -3,8 +3,7 @@ import matplotlib.pyplot as plt
 from math import e
 import time
 from scipy.constants import hbar
-
-
+from mpl_toolkits.mplot3d import Axes3D 
 
 '''
 Liste de constantes utiles
@@ -23,14 +22,15 @@ def psi_0(x, L):
     x_0 = L/2
     sig = 1e-10 #en mètres
     k = 5e10 # en 1/mètres
-    psi = e**(-(x-x_0)**2/(2*sig**2))*e**(1j*k*x)
+    psi = np.exp(-(x-x_0)**2/(2*sig**2))*np.exp(1j*k*x)
     return psi
+
 
 def matrice(lettre,N,L,h):
     '''
-    Fonction crée la matrice A ou B
+    Fonction qui crée la matrice A ou B
 
-    Paramètres: lettre: choix de matrice à créer, ran:nombre de rangées, col:nombre de colonnes, 
+    Paramètres: lettre: choix de matrice à créer, 
                 N:nombre d'itérations positionnelles, L: longueur de la boîte, h:grandeur des itérations temporelles
 
     Retourne: une matrice tridiagonale qui constitue notre système d'équations différentielles
@@ -39,7 +39,7 @@ def matrice(lettre,N,L,h):
     a_1 = 1 + h*1j*hbar/(2*m_e*a**2)
     a_2 = -h*1j*hbar/(4*m_e*a**2)
     b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
-    b_2 = h*1j*hbar/(4*m_e**2)
+    b_2 = h*1j*hbar/(4*m_e*a**2)
     matrice = np.zeros((N+1,N+1),complex)
     if lettre == 'A':
         for i in range(N+1):
@@ -70,19 +70,28 @@ def psi_0_vec(L,N):
     psi0 = np.empty([N+1,1],complex)
     for i in range(N+1):
         psi0[i]=psi_0(i*a,L)
-        # print(i)
     return psi0
 
+'''
+liste_x = np.arange(0,1e-8,1e-8/(1001))
+liste_psi = []
+for i in liste_x:
+    liste_psi.append(psi_0(i,1e-8))
+plt.plot(liste_x,liste_psi)
+plt.show()
+'''
 
 def v_vec(L,N,h,psi):
     '''
     Fonction qui construit le vecteur v à partir de B et psi
 
     Paramètres: L:Longueur de la boîte, N: nombre de pas positionnel, h:grandeur des pas temporelles
+
+    Retourne 
     '''
     a = L/N
     b_1 = 1 - h*1j*hbar/(2*m_e*a**2)
-    b_2 = h*1j*hbar/(4*m_e**2)
+    b_2 = h*1j*hbar/(4*m_e*a**2)
     v = np.empty((N+1,1),complex)
     v[0] = b_1*psi[0]+b_2*psi[1]
     v[N] = b_1*psi[N]+b_2*psi[N-1]
@@ -91,16 +100,65 @@ def v_vec(L,N,h,psi):
     return v
 
 
-def Crank_Nico(h,N):
+def Crank_Nico(h,N,L):
     '''
     Fonction qui estime la valeur de psi en fonction du temps et de x avec la méthode de Crank-Nicolson
 
-    Paramètres:
+    Paramètres: h: grandeur des itérations temporelles, N: nombre d'itérations positionnelle, L:longueur de la boîte
 
     Retourne:
     '''
 
+    #On crée une figure pyplot
+    plt.ion()
 
+    figure, ax = plt.subplots(figsize=(8, 6))
+    
+    #On crée nos matrices
+    A = matrice("A",N,1e-8,1e-18)
+    
+    #On crée notre vecteur initial
+    psi = psi_0_vec(L,N)
+
+    #On crée nos liste vides qui serviront à stocker nos points (eventuellement pour tracer)
+    liste_x = np.arange(0,L,L/(N+1))
+    liste_z =[]
+    for i in range(len(liste_x)):
+        liste_z.append(0)
+    liste_psi = []
+
+    #On crée un compteur pour le temps
+    t=0
+    
+    #On crée le premier état (t=0)
+    etat_1=np.transpose(np.real(psi))
+    etat_2 = np.transpose(np.imag(psi))
+    liste_psi = etat_1
+    liste_zim = etat_2
+
+    #On plot le premier etat
+    ax = plt.axes(projection='3d')
+    line = ax.plot3D(liste_x, liste_psi[0],  liste_zim[0], c='blue')
+    plt.show()
+    plt.pause(0.2)
+    #On crée une boucle infini
+    while True:
+        #On augmente notre compteur de temps de h
+        t += h
+        #On applique la méhode de thomas pour trouver le deuxième etat
+        v= v_vec(L,N,h,psi)
+        psi = Thomas(A,v)
+        plt.ylim(-1, 1)
+        etat = np.transpose(np.real(psi))
+        etat2 = np.transpose(np.imag(psi))
+        liste_psi = etat
+        liste_zim = etat2
+        #On plot le premier etat
+        line = ax.plot3D(liste_x, liste_psi[0],  liste_zim[0], c='blue')
+        figure.show()
+        figure.canvas.flush_events()
+        time.sleep(0.00001)
+        ax.cla()
 
 def Thomas(MatriceIni, VecteurIni):
     '''
@@ -118,29 +176,18 @@ def Thomas(MatriceIni, VecteurIni):
     Vecteur = np.copy(VecteurIni)
 
     # Boucle qui fait la réduction de Gauss simplifiée sur la matrice et le vecteur.
-    for i in range(taille-1):
+    for i in range(taille - 1):
         Vecteur[i][0] /= (Matrice[i][i])
         Matrice[i] /= (Matrice[i][i])
-        Vecteur[i+1][0] -= (Matrice[i+1][i])*(Vecteur[i][0])
-        Matrice[i+1] -= ((Matrice[i+1][i])*(Matrice[i]))
-    Vecteur[taille-1][0] /= (Matrice[taille-1][taille-1])
-    Matrice[taille-1] /= (Matrice[taille-1][taille-1])
-    
+        Vecteur[i + 1][0] -= (Matrice[i + 1][i]) * (Vecteur[i][0])
+        Matrice[i + 1] -= ((Matrice[i + 1][i]) * (Matrice[i]))
+    Vecteur[taille - 1][0] /= (Matrice[taille - 1][taille - 1])
+    Matrice[taille - 1] /= (Matrice[taille - 1][taille - 1])
+
     # Boucle qui construit notre vecteur de sortie.
-    for i in reversed(range(taille-1)):
-        Vecteur[i][0] -= (Matrice[i][i+1])*(Vecteur[i+1][0])
+    for i in reversed(range(taille - 1)):
+        Vecteur[i][0] -= (Matrice[i][i + 1]) * (Vecteur[i + 1][0])
     return Vecteur
 
 
-N=1000
-matriceA = matrice("A", N, 1e-8, 1e-18)
-psi = psi_0_vec(1e-8, N)
-Vecteur = v_vec(1e-8, N,1e-18,psi)
-pos2 = np.linalg.solve(matriceA, Vecteur)
-pos1 = Thomas(matriceA, Vecteur)
-x = np.linspace(0, 1e-8, N+1)
-plt.plot(x, pos2, c="b") # linalg
-plt.plot(x, pos1, c="r") # thomas
-plt.show()
-
-
+Crank_Nico(1e-18,1000,1e-8)

@@ -2,3 +2,5 @@
 .ipynb_checkpoints/LE JUP4-checkpoint.ipynb
 .idea/workspace.xml
 .idea/workspace.xml
+*.xml
+anim.py
