@@ -139,10 +139,12 @@ def Crank_Nico(h,N,L):
     '''
 
     #On crée une figure pyplot
-    fig = plt.figure()
+    plt.ion()
+
+    figure, ax = plt.subplots(figsize=(8, 6))
     
     #On crée nos matrices
-    A = matrice("A",1000,1e-8,1e-18)
+    A = matrice("A",N,1e-8,1e-18)
     
     #On crée notre vecteur initial
     psi = psi_0_vec(L,N)
@@ -159,11 +161,9 @@ def Crank_Nico(h,N,L):
     liste_psi = etat_1
 
     #On plot le premier etat
-    plt.plot(liste_x,liste_psi[0])
+    line1, = ax.plot(liste_x,liste_psi[0])
     plt.ylim(-1,1)
-    plt.draw()
     plt.pause(0.2)
-    fig.clear()
     #On crée une boucle infini
     while True:
         #On augmente notre compteur de temps de h
@@ -171,16 +171,15 @@ def Crank_Nico(h,N,L):
         #On applique la méhode de thomas pour trouver le deuxième etat
         v= v_vec(L,N,h,psi)
         psi = np.linalg.solve(A,v)
-
+        plt.ylim(-1, 1)
         etat = np.transpose(np.real(psi))
         liste_psi = etat
 
         #On plot le premier etat
-        plt.plot(liste_x,liste_psi[0])
-        plt.draw()
-        plt.pause(0.0000000001)
-        fig.clear()
-
+        line1.set_ydata(liste_psi[0])
+        figure.show()
+        figure.canvas.flush_events()
+        time.sleep(0.00001)
 
 def Thomas(Matrice, Vecteur):
     '''
