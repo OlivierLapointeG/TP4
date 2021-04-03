@@ -8,7 +8,10 @@ from mpl_toolkits.mplot3d import Axes3D
 '''
 Liste de constantes utiles
 '''
-m_e = 9.109e-31 # kg 
+m_e = 9.109e-31 # kg
+a = 0
+a_1 = 0
+a_2 = 0
 
 
 def psi_0(x, L):
@@ -35,6 +38,8 @@ def matrice(lettre,N,L,h):
 
     Retourne: une matrice tridiagonale qui constitue notre système d'équations différentielles
     '''
+    global a_1
+    global a_2
     a = L/N
     a_1 = 1 + h*1j*hbar/(2*m_e*a**2)
     a_2 = -h*1j*hbar/(4*m_e*a**2)
@@ -161,34 +166,41 @@ def Crank_Nico(h,N,L):
         time.sleep(0.00001)
         ax.cla()
 
-def Thomas(MatriceIni, VecteurIni):
+def Thomas(N, VecteurIni):
     '''
-    Fonction qui utilise l'algo de Thomas pour résoudre AX = v
+    Fonction qui utilise l'algo de Thomas pour résoudre AX = v. Résout spécifiquement avec la matrice A.
 
-    Paramètres: Matrice est un matrice carré tridiagonale, Vecteur est une matrice vecteur
+    Paramètres: "N" est la dimension de A et de V, "Vecteur" est une matrice vecteur
 
     Retourne: Un vecteur correspondant à X
 
     NOTE: Jesus saith unto him, Thomas, because thou hast seen me, thou hast believed:
     blessed are they that have not seen, and yet have believed
     '''
-    taille = len(MatriceIni)
-    Matrice = np.copy(MatriceIni)
+    taille = N
     Vecteur = np.copy(VecteurIni)
+    matriceloc = [a_2/a_1]
+    Vecteur[0][0] /= a_1
 
-    # Boucle qui fait la réduction de Gauss simplifiée sur la matrice et le vecteur.
-    for i in range(taille - 1):
-        Vecteur[i][0] /= (Matrice[i][i])
-        Matrice[i] /= (Matrice[i][i])
-        Vecteur[i + 1][0] -= (Matrice[i + 1][i]) * (Vecteur[i][0])
-        Matrice[i + 1] -= ((Matrice[i + 1][i]) * (Matrice[i]))
-    Vecteur[taille - 1][0] /= (Matrice[taille - 1][taille - 1])
-    Matrice[taille - 1] /= (Matrice[taille - 1][taille - 1])
+    # Boucle calculant la diagonale suppérieure de la matrice A, qui sert à calculer les X
+    for i in range(taille):
+        div = (a_1 - a_2 * matriceloc[i-1])
+        matriceloc.append(a_2/div)
+        Vecteur[i+1][0] = (Vecteur[i+1][0] - a_2 * Vecteur[i][0]) / div
 
-    # Boucle qui construit notre vecteur de sortie.
-    for i in reversed(range(taille - 1)):
-        Vecteur[i][0] -= (Matrice[i][i + 1]) * (Vecteur[i + 1][0])
+    # Boucle calculant les X
+    for i in reversed(range(taille)):
+        Vecteur[i][0] -= matriceloc[i] * (Vecteur[i + 1][0])
     return Vecteur
 
 
+matriceA = matrice("A", 1000, 1e-8, 1e-18)
+psi = psi_0_vec(1e-8, 1000)
+v = v_vec(1e-8, 1000, 1e-18, psi)
+pos1 = Thomas(matriceA, v)
+pos2 = np.linalg.solve(matriceA, v)
+x = np.linspace(0, 1e-8, 1001)
+plt.plot(x, pos1, c="r")
+plt.plot(x, pos2, c="b", linestyle="--")
+# plt.show()
 Crank_Nico(1e-18,1000,1e-8)
