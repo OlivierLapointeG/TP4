@@ -167,7 +167,7 @@ def Crank_Nico(h,N,L):
 
     #On plot le premier etat
     ax = plt.axes(projection='3d')
-    line = ax.plot3D(liste_x, liste_psi[0],  liste_z, c='blue')
+    line = ax.plot3D(liste_x, liste_psi[0],  liste_zim[0], c='blue')
     plt.show()
     plt.pause(0.2)
     #On crée une boucle infini
@@ -183,10 +183,11 @@ def Crank_Nico(h,N,L):
         liste_psi = etat
         liste_zim = etat2
         #On plot le premier etat
-        line = ax.plot3D(liste_x, liste_psi[0],  liste_z, c='blue')
+        line = ax.plot3D(liste_x, liste_psi[0],  liste_zim[0], c='blue')
         figure.show()
         figure.canvas.flush_events()
         time.sleep(0.00001)
+        ax.cla()
 
 def Thomas(Matrice, Vecteur):
     '''
