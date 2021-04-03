@@ -148,12 +148,13 @@ def Crank_Nico(h,N,L):
         #On applique la méhode de thomas pour trouver le deuxième etat
         v= v_vec(L,N,h,psi)
         psi = Thomas(A,v)
-        plt.ylim(-1, 1)
         etat = np.transpose(np.real(psi))
         etat2 = np.transpose(np.imag(psi))
         liste_psi = etat
         liste_zim = etat2
         #On plot le premier etat
+        ax.set_ylim3d(-1,1)
+        ax.set_zlim3d(-1,1)
         line = ax.plot3D(liste_x, liste_psi[0],  liste_zim[0], c='blue')
         figure.show()
         figure.canvas.flush_events()
