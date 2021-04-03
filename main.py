@@ -162,7 +162,7 @@ def Crank_Nico(h,N,L,m):
     liste_etats.append(liste_psi)
 
     #On crée une boucle infini
-    while t<m*e-18:
+    while t<m*1e-18:
         #On augmente notre compteur de temps de h
         t += h
         #On applique la méhode de thomas pour trouver le deuxième etat
