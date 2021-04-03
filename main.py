@@ -147,7 +147,7 @@ def Crank_Nico(h,N,L):
         t += h
         #On applique la méhode de thomas pour trouver le deuxième etat
         v= v_vec(L,N,h,psi)
-        psi = np.linalg.solve(A,v)
+        psi = Thomas(A,v)
         plt.ylim(-1, 1)
         etat = np.transpose(np.real(psi))
         etat2 = np.transpose(np.imag(psi))
