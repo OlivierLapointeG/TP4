@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from math import e
 import time
 from scipy.constants import hbar
-
+from mpl_toolkits.mplot3d import Axes3D 
 
 '''
 Liste de constantes utiles
