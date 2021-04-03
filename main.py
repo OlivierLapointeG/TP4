@@ -100,35 +100,6 @@ def v_vec(L,N,h,psi):
     return v
 
 
-def Thomas(Matrice, Vecteur):
-    '''
-    Fonction qui utilise l'algo de Thomas pour résoudre AX = v
-
-    Paramètres: Matrice est un matrice carré tridiagonale, Vecteur est une matrice vecteur
-
-    Retourne: Un vecteur correspondant à X
-
-    NOTE: Jesus saith unto him, Thomas, because thou hast seen me, thou hast believed:
-    blessed are they that have not seen, and yet have believed
-    '''
-    taille = len(Matrice)
-    noVect = np.empty([taille,1])
-
-    # Boucle qui fait la réduction de Gauss simplifiée sur la matrice et le vecteur.
-    for i in range(taille-1):
-        Vecteur[i][0] = Vecteur[i][0]/ Matrice[i][i]
-        Matrice[i] = Matrice[i]/ Matrice[i][i]
-        Vecteur[i+1][0] = Vecteur[i+1][0] - Matrice[i+1][i]*Vecteur[i][0]
-        Matrice[i+1] = Matrice[i+1]-(Matrice[i+1][i]* Matrice[i])
-    Vecteur[taille-1][0] = Vecteur[taille-1][0]/ Matrice[taille-1][taille-1]
-    Matrice[taille-1] = Matrice[taille-1] / Matrice[taille-1][taille-1]
-    noVect[taille - 1][0] = Vecteur[taille - 1][0]
-    
-    # Boucle qui construit notre vecteur de sortie.
-    for i in reversed(range(taille-1)):
-        noVect[i][0] = Vecteur[i][0] - Matrice[i][i+1]*noVect[i+1][0]
-    return noVect
-
 def Crank_Nico(h,N,L):
     '''
     Fonction qui estime la valeur de psi en fonction du temps et de x avec la méthode de Crank-Nicolson
@@ -182,7 +153,7 @@ def Crank_Nico(h,N,L):
         fig.clear()
 
 
-def Thomas(Matrice, Vecteur):
+def Thomas(MatriceIni, VecteurIni):
     '''
     Fonction qui utilise l'algo de Thomas pour résoudre AX = v
 
@@ -193,23 +164,35 @@ def Thomas(Matrice, Vecteur):
     NOTE: Jesus saith unto him, Thomas, because thou hast seen me, thou hast believed:
     blessed are they that have not seen, and yet have believed
     '''
-    taille = len(Matrice)
-    noVect = np.empty([taille,1])
+    taille = len(MatriceIni)
+    Matrice = np.copy(MatriceIni)
+    Vecteur = np.copy(VecteurIni)
 
     # Boucle qui fait la réduction de Gauss simplifiée sur la matrice et le vecteur.
-    for i in range(taille-1):
-        Vecteur[i][0] = Vecteur[i][0]/ Matrice[i][i]
-        Matrice[i] = Matrice[i]/ Matrice[i][i]
-        Vecteur[i+1][0] = Vecteur[i+1][0] - Matrice[i+1][i]*Vecteur[i][0]
-        Matrice[i+1] = Matrice[i+1]-(Matrice[i+1][i]* Matrice[i])
-    Vecteur[taille-1][0] = Vecteur[taille-1][0]/ Matrice[taille-1][taille-1]
-    Matrice[taille-1] = Matrice[taille-1] / Matrice[taille-1][taille-1]
-    noVect[taille - 1][0] = Vecteur[taille - 1][0]
-    
+    for i in range(taille - 1):
+        Vecteur[i][0] /= (Matrice[i][i])
+        Matrice[i] /= (Matrice[i][i])
+        Vecteur[i + 1][0] -= (Matrice[i + 1][i]) * (Vecteur[i][0])
+        Matrice[i + 1] -= ((Matrice[i + 1][i]) * (Matrice[i]))
+    Vecteur[taille - 1][0] /= (Matrice[taille - 1][taille - 1])
+    Matrice[taille - 1] /= (Matrice[taille - 1][taille - 1])
+
     # Boucle qui construit notre vecteur de sortie.
-    for i in reversed(range(taille-1)):
-        noVect[i][0] = Vecteur[i][0] - Matrice[i][i+1]*noVect[i+1][0]
-    return noVect
+    for i in reversed(range(taille - 1)):
+        Vecteur[i][0] -= (Matrice[i][i + 1]) * (Vecteur[i + 1][0])
+    return Vecteur
+
+
+N = 1000
+matriceA = matrice("A", N, 1e-8, 1e-18)
+psi = psi_0_vec(1e-8, N)
+Vecteur = v_vec(1e-8, N, 1e-18, psi)
+pos2 = np.linalg.solve(matriceA, Vecteur)
+pos1 = Thomas(matriceA, Vecteur)
+x = np.linspace(0, 1e-8, N + 1)
+plt.plot(x, pos2, c="b")  # linalg
+plt.plot(x, pos1, c="r", linestyle="--")  # thomas
+plt.show()
     
 
 Crank_Nico(1e-18,1000,1e-8)
