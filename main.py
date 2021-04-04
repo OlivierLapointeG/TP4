@@ -105,66 +105,97 @@ def v_vec(L,N,h,psi):
     return v
 
 
-def Crank_Nico(h,N,L):
+def Crank_Nico(h, N, L, m):
     '''
     Fonction qui estime la valeur de psi en fonction du temps et de x avec la méthode de Crank-Nicolson
 
-    Paramètres: h: grandeur des itérations temporelles, N: nombre d'itérations positionnelle, L:longueur de la boîte
+    Paramètres: h: grandeur des itérations temporelles, N: nombre d'itérations positionnelle, L:longueur de la boîte,
+                m: nombre d'itérations temporelles
 
-    Retourne:
+    Retourne: liste des états
     '''
 
-    #On crée une figure pyplot
-    plt.ion()
+    # On crée nos matrices
+    A = matrice("A", N, 1e-8, 1e-18)
 
-    figure, ax = plt.subplots(figsize=(8, 6))
-    
-    #On crée nos matrices
-    A = matrice("A",N,1e-8,1e-18)
-    
-    #On crée notre vecteur initial
-    psi = psi_0_vec(L,N)
+    # On crée notre vecteur initial
+    psi = psi_0_vec(L, N)
 
-    #On crée nos liste vides qui serviront à stocker nos points (eventuellement pour tracer)
-    liste_x = np.arange(0,L,L/(N+1))
-    liste_z =[]
-    for i in range(len(liste_x)):
-        liste_z.append(0)
+    # On crée nos liste vides qui serviront à stocker nos points (eventuellement pour tracer)
+    liste_x = [0]
+    for i in range(N):
+        liste_x.append(liste_x[-1] + (L / N))
     liste_psi = []
+    liste_etats = []
 
-    #On crée un compteur pour le temps
-    t=0
-    
-    #On crée le premier état (t=0)
-    etat_1=np.transpose(np.real(psi))
-    etat_2 = np.transpose(np.imag(psi))
+    # On crée un compteur pour le temps
+    t = 0
+
+    # On crée le premier état (t=0)
+    etat_1 = np.transpose(psi)[0]
     liste_psi = etat_1
-    liste_zim = etat_2
+    liste_etats.append(liste_psi)
 
-    #On plot le premier etat
-    ax = plt.axes(projection='3d')
-    line = ax.plot3D(liste_x, liste_psi[0],  liste_zim[0], c='blue')
-    plt.show()
-    plt.pause(0.2)
-    #On crée une boucle infini
-    while True:
-        #On augmente notre compteur de temps de h
+    # On crée une boucle infini
+    while t < m * 1e-18:
+        # On augmente notre compteur de temps de h
         t += h
-        #On applique la méhode de thomas pour trouver le deuxième etat
-        v= v_vec(L,N,h,psi)
-        psi = Thomas(A,v)
-        etat = np.transpose(np.real(psi))
-        etat2 = np.transpose(np.imag(psi))
+        # On applique la méhode de thomas pour trouver le deuxième etat
+        v = v_vec(L, N, h, psi)
+        psi = Thomas(N, v)
+
+        etat = np.transpose(psi)[0]
         liste_psi = etat
-        liste_zim = etat2
-        #On plot le premier etat
-        ax.set_ylim3d(-1,1)
-        ax.set_zlim3d(-1,1)
-        line = ax.plot3D(liste_x, liste_psi[0],  liste_zim[0], c='blue')
-        figure.show()
-        figure.canvas.flush_events()
-        time.sleep(0.00001)
-        ax.cla()
+
+        liste_etats.append(liste_psi)
+    return liste_etats
+
+
+def Crank_Nico_linalg(h, N, L, m):
+    '''
+    Fonction qui estime la valeur de psi en fonction du temps et de x avec la méthode de Crank-Nicolson mais en utilisant
+    les fonction de linalg pour les opérations matricielles
+
+    Paramètres: h: grandeur des itérations temporelles, N: nombre d'itérations positionnelle, L:longueur de la boîte,
+                m: nombre d'itérations temporelles
+
+    Retourne: liste des états
+    '''
+
+    # On crée nos matrices
+    A = matrice("A", N, 1e-8, 1e-18)
+    B = matrice("B", N, 1e-8, 1e-18)
+    # On crée notre vecteur initial
+    psi = psi_0_vec(L, N)
+
+    # On crée nos liste vides qui serviront à stocker nos points (eventuellement pour tracer)
+    liste_x = [0]
+    for i in range(N):
+        liste_x.append(liste_x[-1] + (L / N))
+    liste_psi = []
+    liste_etats = []
+
+    # On crée un compteur pour le temps
+    t = 0
+
+    # On crée le premier état (t=0)
+    etat_1 = np.transpose(psi)[0]
+    liste_psi = etat_1
+    liste_etats.append(liste_psi)
+
+    # On crée une boucle infini
+    while t < m * 1e-18:
+        # On augmente notre compteur de temps de h
+        t += h
+        # On applique la méhode de thomas pour trouver le deuxième etat
+        v = np.matmul(B, psi)
+        psi = np.linalg.solve(A, v)
+
+        etat = np.transpose(psi)[0]
+        liste_psi = etat
+
+        liste_etats.append(liste_psi)
+    return liste_etats
 
 def Thomas(N, VecteurIni):
     '''
@@ -194,13 +225,13 @@ def Thomas(N, VecteurIni):
     return Vecteur
 
 
-matriceA = matrice("A", 1000, 1e-8, 1e-18)
-psi = psi_0_vec(1e-8, 1000)
-v = v_vec(1e-8, 1000, 1e-18, psi)
-pos1 = Thomas(matriceA, v)
-pos2 = np.linalg.solve(matriceA, v)
-x = np.linspace(0, 1e-8, 1001)
-plt.plot(x, pos1, c="r")
-plt.plot(x, pos2, c="b", linestyle="--")
-# plt.show()
-Crank_Nico(1e-18,1000,1e-8)
+def timer_Crank():
+    debut = time.time()
+    Crank_Nico(1e-18,1000,1e-8,100)
+    fin = time.time()
+    debut1 = time.time()
+    Crank_Nico_linalg(1e-18, 1000, 1e-8, 100)
+    fin1 = time.time()
+    print('Nous :', fin-debut)
+    print('Linalg :', fin1-debut1)
+timer_Crank()
