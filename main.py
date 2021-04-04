@@ -175,8 +175,10 @@ def Crank_Nico(h,N,L,m):
         liste_etats.append(liste_psi)
     return liste_etats
 
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=45, metadata=dict(artist='Me'), bitrate=1800)
 
-liste_y = Crank_Nico(1e-18,1000,1e-8,1000)
+liste_y = Crank_Nico(1e-18,1000,1e-8,2500)
 liste_x = [0]
 for i in range(1000):
     liste_x.append(liste_x[-1]+((1e-8)/1000))
@@ -192,5 +194,5 @@ def animate(i):
     plt.plot(x,y)
     plt.ylim(-1,1)
 
-ani = animation.FuncAnimation(fig, animate, interval=1,blit=False)
-plt.show()
+ani = animation.FuncAnimation(fig, animate, frames=2400, interval=1,blit=False)
+ani.save('test3.mp4', writer=writer)
